@@ -110,6 +110,6 @@ RSpec.describe Api::LinksBuilder do
   end
 
   def create_href(offsets)
-    "/api/vms?filter[]=name='aa'&offset=#{offsets["offset"]}&limit=#{offsets["limit"]}"
+    "/api/vms?offset=#{offsets["offset"]}&limit=#{offsets["limit"]}"
   end
 end
