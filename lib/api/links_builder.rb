@@ -1,8 +1,6 @@
 module Api
   class LinksBuilder
-    def initialize(params, href, counts)
-      @offset = params["offset"].to_i if params["offset"]
-      @limit = params["limit"].to_i if params["limit"]
+    def initialize(href, counts)
       @href = href
       @counts = counts if counts
       validate_limit
@@ -28,7 +26,7 @@ module Api
 
     private
 
-    attr_reader :offset, :limit, :href, :counts
+    attr_reader :href, :counts
 
     def validate_limit
       raise BadRequestError, "Limit must be greater than zero if offset is specified" if links? && limit.zero?
@@ -72,6 +70,16 @@ module Api
     def last_href
       last_offset = paging_count - (paging_count % limit)
       format_href(last_offset)
+    end
+
+    def limit
+      param = URI.parse(href).query.to_s.split("&").detect { |q| q.start_with?("limit=") }
+      param ? param.split("=").last.to_i : Settings.api.max_results_per_page
+    end
+
+    def offset
+      param = URI.parse(href).query.to_s.split("&").detect { |q| q.start_with?("offset=") }
+      param ? param.split("=").last.to_i : 0
     end
   end
 end
