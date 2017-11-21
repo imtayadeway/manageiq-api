@@ -1,7 +1,7 @@
 module Api
   class LinksBuilder
     def initialize(href, counts)
-      @href = href
+      @href = URI.parse(href)
       @counts = counts if counts
     end
 
@@ -28,7 +28,7 @@ module Api
     end
 
     def format_href(new_offset)
-      result = URI.parse(href)
+      result = href.dup
       new_params = query_params.reject { |q| q.start_with?("offset=") }
       new_params.unshift("offset=#{new_offset}")
       result.query = new_params.join("&")
@@ -72,7 +72,7 @@ module Api
     end
 
     def query_params
-      URI.parse(href).query.to_s.split("&")
+      href.query.to_s.split("&")
     end
   end
 end
