@@ -30,7 +30,7 @@ module Api
       # Given a resource, return its serialized flavor using Jbuilder
       #
       def collection_to_jbuilder(type, reftype, resources, opts = {})
-        link_builder = Api::LinksBuilder.new(@req.url, opts[:counts])
+        link_builder = Api::LinksBuilder.new(@req.url, opts[:counts].subquery_count || opts[:counts].count)
         Jbuilder.new do |json|
           json.ignore_nil!
           json.set! 'name', opts[:name] if opts[:name]

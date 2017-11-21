@@ -1,8 +1,8 @@
 module Api
   class LinksBuilder
-    def initialize(href, counts)
+    def initialize(href, count)
       @href = URI.parse(href)
-      @counts = counts if counts
+      @count = count
     end
 
     def links
@@ -16,12 +16,12 @@ module Api
     end
 
     def pages
-      (paging_count / limit.to_f).ceil
+      (count / limit.to_f).ceil
     end
 
     private
 
-    attr_reader :href, :counts
+    attr_reader :href, :count
 
     def self_href
       @self_href ||= format_href(offset)
@@ -35,13 +35,9 @@ module Api
       result.to_s
     end
 
-    def paging_count
-      @paging_count ||= counts.subquery_count || counts.count
-    end
-
     def next_href
       next_offset = offset + limit
-      return if next_offset >= paging_count
+      return if next_offset >= count
       format_href(next_offset)
     end
 
@@ -57,7 +53,7 @@ module Api
     end
 
     def last_href
-      last_offset = paging_count - (paging_count % limit)
+      last_offset = count - (count % limit)
       format_href(last_offset)
     end
 

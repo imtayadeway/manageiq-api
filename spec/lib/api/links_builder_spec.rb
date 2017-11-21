@@ -2,8 +2,7 @@ RSpec.describe Api::LinksBuilder do
   describe "#links" do
     it "returns self, first, next, and last links when it is the first page" do
       offsets = { "offset" => 0, "limit" => 2 }
-      counts = Api::QueryCounts.new(7, 2)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 7)
       links = link_builder.links
       expect(links.keys).to match_array([:self, :first, :next, :last])
       expect(links[:self]).to eq(create_href(offsets))
@@ -13,8 +12,7 @@ RSpec.describe Api::LinksBuilder do
 
     it "returns all of the links if it is a middle page" do
       offsets = { "offset" => 2, "limit" => 2 }
-      counts = Api::QueryCounts.new(7, 2)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 7)
       links = link_builder.links
 
       expect(links.keys).to match_array([:self, :next, :previous, :first, :last])
@@ -27,8 +25,7 @@ RSpec.describe Api::LinksBuilder do
 
     it "returns self, previous, first, last if it is the last page" do
       offsets = { "offset" => 3, "limit" => 2 }
-      counts = Api::QueryCounts.new(7, 2, 3)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 3)
       links = link_builder.links
       expect(links.keys).to eq([:self, :previous, :first, :last])
       expect(links[:self]).to eq(create_href(offsets))
@@ -39,8 +36,7 @@ RSpec.describe Api::LinksBuilder do
 
     it "always returns self, first, and last" do
       offsets = { "offset" => 0, "limit" => 3 }
-      counts = Api::QueryCounts.new(7, 3, 3)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 3)
       links = link_builder.links
 
       expect(links.keys).to match_array([:self, :first, :last])
@@ -49,18 +45,14 @@ RSpec.describe Api::LinksBuilder do
 
     it "previous link is equal to first link if previous offset would be 0" do
       offsets = { "offset" => 10, "limit" => 12 }
-      counts = Api::QueryCounts.new(22, 22, 22)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 22)
       links = link_builder.links
 
       expect(links[:previous]).to eq(links[:first])
     end
 
     it "will construct a valid URI when there are no incoming query params" do
-      builder = Api::LinksBuilder.new(
-        "http://example.com/api/features",
-        double(Api::QueryCounts, :subquery_count => 1)
-      )
+      builder = Api::LinksBuilder.new("http://example.com/api/features", 1)
 
       expected = {
         :first => "http://example.com/api/features?offset=0",
@@ -75,27 +67,23 @@ RSpec.describe Api::LinksBuilder do
     let(:offsets) { { "offset" => 0, "limit" => 2 } }
 
     it "returns correct page count when last page count is less than the limit" do
-      counts = Api::QueryCounts.new(7, 2)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 7)
       expect(link_builder.pages).to eq(4)
     end
 
     it "returns correct page count when there is only one page" do
-      counts = Api::QueryCounts.new(7, 2, 2)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 2)
       expect(link_builder.pages).to eq(1)
     end
 
     it "returns correct page count when there are no subquery results" do
-      counts = Api::QueryCounts.new(7, 2, 0)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 0)
       expect(link_builder.pages).to eq(0)
     end
 
     it "returns the correct page count when last page count is equal to the limit" do
       offsets = { "offset" => 0, "limit" => 3 }
-      counts = Api::QueryCounts.new(6, 3)
-      link_builder = Api::LinksBuilder.new(create_href(offsets), counts)
+      link_builder = Api::LinksBuilder.new(create_href(offsets), 6)
       expect(link_builder.pages).to eq(2)
     end
   end
