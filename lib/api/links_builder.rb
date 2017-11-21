@@ -3,7 +3,6 @@ module Api
     def initialize(href, counts)
       @href = href
       @counts = counts if counts
-      validate_limit
     end
 
     def links
@@ -23,10 +22,6 @@ module Api
     private
 
     attr_reader :href, :counts
-
-    def validate_limit
-      raise BadRequestError, "Limit must be greater than zero if offset is specified" if limit.zero?
-    end
 
     def self_href
       @self_href ||= format_href(offset)

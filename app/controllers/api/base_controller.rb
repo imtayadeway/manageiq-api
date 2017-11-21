@@ -25,7 +25,7 @@ module Api
                   :validate_api_request
     before_action :validate_api_action, :except => [:options]
     before_action :validate_response_format, :except => [:destroy]
-    before_action :ensure_pagination, :only => :index
+    before_action :ensure_pagination, :validate_limit, :only => :index
     after_action :log_api_response
 
     respond_to :json
@@ -145,6 +145,10 @@ module Api
       end
       params["limit"] = [Settings.api.max_results_per_page, params["limit"]].compact.collect(&:to_i).min
       params["offset"] ||= 0
+    end
+
+    def validate_limit
+      raise BadRequestError, "Limit must be greater than zero if offset is specified" if params["limit"].zero?
     end
   end
 end
