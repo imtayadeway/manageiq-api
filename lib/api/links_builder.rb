@@ -32,7 +32,7 @@ module Api
         href.sub("offset=#{offset}", "offset=#{new_offset}")
       else
         result = URI.parse(href)
-        result.query = [result.query, "offset=#{new_offset}"].compact.join("&")
+        result.query = (query_params + ["offset=#{new_offset}"]).join("&")
         result.to_s
       end
     end
@@ -64,13 +64,17 @@ module Api
     end
 
     def limit
-      param = URI.parse(href).query.to_s.split("&").detect { |q| q.start_with?("limit=") }
+      param = query_params.detect { |q| q.start_with?("limit=") }
       param ? param.split("=").last.to_i : Settings.api.max_results_per_page
     end
 
     def offset
-      param = URI.parse(href).query.to_s.split("&").detect { |q| q.start_with?("offset=") }
+      param = query_params.detect { |q| q.start_with?("offset=") }
       param ? param.split("=").last.to_i : 0
+    end
+
+    def query_params
+      URI.parse(href).query.to_s.split("&")
     end
   end
 end
