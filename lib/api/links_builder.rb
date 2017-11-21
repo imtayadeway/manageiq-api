@@ -20,16 +20,12 @@ module Api
       (paging_count / limit.to_f).ceil
     end
 
-    def links?
-      offset && limit
-    end
-
     private
 
     attr_reader :href, :counts
 
     def validate_limit
-      raise BadRequestError, "Limit must be greater than zero if offset is specified" if links? && limit.zero?
+      raise BadRequestError, "Limit must be greater than zero if offset is specified" if limit.zero?
     end
 
     def self_href

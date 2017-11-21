@@ -41,7 +41,7 @@ module Api
             end
           end
 
-          json.set! 'pages', link_builder.pages if link_builder.links?
+          json.set! 'pages', link_builder.pages if params["action"] == "index"
 
           unless @req.hide?("resources") || collection_option?(:hide_resources)
             key_id = collection_config.resource_identifier(type)
@@ -57,7 +57,7 @@ module Api
           aspecs = gen_action_spec_for_collections(type, cspec, opts[:is_subcollection], reftype) if cspec
           add_actions(json, aspecs, reftype)
 
-          if link_builder.links?
+          if params["action"] == "index"
             json.links do
               link_builder.links.each do |link_name, link_href|
                 json.set! link_name, link_href
