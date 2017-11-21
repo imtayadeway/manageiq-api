@@ -28,13 +28,11 @@ module Api
     end
 
     def format_href(new_offset)
-      if href.include?("offset")
-        href.sub("offset=#{offset}", "offset=#{new_offset}")
-      else
-        result = URI.parse(href)
-        result.query = (query_params + ["offset=#{new_offset}"]).join("&")
-        result.to_s
-      end
+      result = URI.parse(href)
+      new_params = query_params.reject { |q| q.start_with?("offset=") }
+      new_params.unshift("offset=#{new_offset}")
+      result.query = new_params.join("&")
+      result.to_s
     end
 
     def paging_count
